@@ -28,17 +28,30 @@ export type EventResult = {
 export class SlackEventUsecase {
   constructor(private slackClient: SlackClientInterface) {}
 
-  async handleUrlVerification(body: SlackEventBody): Promise<Result<string, EventError>> {
-    if (!body.challenge) {
-      return err({
-        type: "INVALID_INPUT",
-        message: "Challenge token missing in URL verification request",
+  async exec(body: SlackEventBody): Promise<Result<EventResult, EventError>> {
+    // SlackのURL検証（初回だけ来るやつ）
+    if (body.type === "url_verification") {
+      if (!body.challenge) {
+        return err({
+          type: "INVALID_INPUT",
+          message: "Challenge token missing in URL verification request",
+        });
+      }
+
+      return ok({
+        status: 200,
+        body: body.challenge
       });
     }
-    return ok(body.challenge);
-  }
 
-  async handleAppMention(event: SlackEvent): Promise<Result<boolean, EventError>> {
+    const event = body.event;
+    if (!event || event.type !== "app_mention") {
+      return ok({
+        status: 200,
+        body: "Ignored (non-mention)"
+      });
+    }
+
     if (!event.text || !event.channel) {
       return err({
         type: "INVALID_EVENT",
@@ -58,39 +71,12 @@ export class SlackEventUsecase {
 
     return result.map(response => {
       console.log("✅ Sent message:", response.ts);
-      return true;
+      return {
+        status: 200,
+        body: "OK"
+      };
     }).mapErr(error => {
       console.error("❌ Slack API error:", error);
-      return error;
-    });
-  }
-
-  async processEvent(body: SlackEventBody): Promise<Result<EventResult, EventError>> {
-    // SlackのURL検証（初回だけ来るやつ）
-    if (body.type === "url_verification") {
-      const challengeResult = await this.handleUrlVerification(body);
-
-      return challengeResult.map(challenge => ({
-        status: 200,
-        body: challenge
-      }));
-    }
-
-    const event = body.event;
-    if (!event || event.type !== "app_mention") {
-      return ok({
-        status: 200,
-        body: "Ignored (non-mention)"
-      });
-    }
-
-    const mentionResult = await this.handleAppMention(event);
-
-    return mentionResult.map(success => ({
-      status: 200,
-      body: "OK"
-    })).mapErr(error => {
-      console.error("Error handling app mention:", error);
       return error;
     });
   }

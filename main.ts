@@ -24,7 +24,7 @@ serve(async (req) => {
 
   console.log("📥 Received from Slack:", body);
 
-  const resultOrError = await slackEventUsecase.processEvent(body);
+  const resultOrError = await slackEventUsecase.exec(body);
 
   return resultOrError.match(
     (result) => {
