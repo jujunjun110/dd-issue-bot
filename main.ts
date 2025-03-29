@@ -1,9 +1,15 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
+import { SlackClient } from "./src/adapters/slack-client.adapter.ts";
+import { SlackEventUsecase } from "./src/usecases/slack-event.usecase.ts";
 
 const SLACK_BOT_TOKEN = Deno.env.get("SLACK_BOT_TOKEN")!;
 
+// Initialize dependencies
+const slackClient = new SlackClient(SLACK_BOT_TOKEN);
+const slackEventUsecase = new SlackEventUsecase(slackClient);
+
 serve(async (req) => {
-    console.log("💡 Request received:", req.method, req.headers.get("content-type"));
+  console.log("💡 Request received:", req.method, req.headers.get("content-type"));
 
   // Slackのリクエストは基本POST
   if (req.method !== "POST") {
@@ -20,40 +26,18 @@ serve(async (req) => {
 
   console.log("📥 Received from Slack:", body);
 
-  // SlackのURL検証（初回だけ来るやつ）
-  if (body.type === "url_verification") {
-    return new Response(body.challenge);
-  }
+  // Process the event using our usecase
+  const resultOrError = await slackEventUsecase.processEvent(body);
 
-  const event = body.event;
-  if (!event || event.type !== "app_mention") {
-    return new Response("Ignored (non-mention)", { status: 200 });
-  }
-
-  const message = event.text;
-  const channel = event.channel;
-  const thread_ts = event.thread_ts || event.ts;
-
-  // Slackへオウム返し
-  const response = await fetch("https://slack.com/api/chat.postMessage", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${SLACK_BOT_TOKEN}`,
-      "Content-Type": "application/json",
+  return resultOrError.match(
+    // Success case
+    (result) => {
+      return new Response(result.body, { status: result.status });
     },
-    body: JSON.stringify({
-      channel,
-      thread_ts,
-      text: `オウム返し：${message}`,
-    }),
-  });
-
-  const result = await response.json();
-  if (!result.ok) {
-    console.error("❌ Slack API error:", result);
-  } else {
-    console.log("✅ Sent message:", result.ts);
-  }
-
-  return new Response("OK");
+    // Error case
+    (error) => {
+      console.error("❌ Error processing event:", error);
+      return new Response(error.message, { status: 500 });
+    }
+  );
 });
