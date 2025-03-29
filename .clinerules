@@ -1,0 +1,26 @@
+# Coding Rules
+
+- Write in functional style
+  - Minimize use of variable definitions and reassignments with let
+  - Minimize use of for loops
+- Minimize use of else clauses
+  - Avoid using them as they increase cognitive load
+  - Even when necessary, try to eliminate else clauses using ternary operators or by extracting logic into functions
+- Use dependency injection
+  - Initialize all classes at the entry point and pass them to other classes
+  - Write interfaces for clients that depend on external systems to make dependent classes testable
+- Write tests for each work unit to verify correctness
+  - Use jest
+  - To save time during development, don't run tests for all files using `npm jest`, instead run single test files or cases using `npx jest test/.../xxx.ts --testNamePattern="testName"`
+  - For cases where test results cannot be read from standard output, output the test results to ./commandResult.txt as a file and read from it
+- Stay focused on the assigned work unit
+  - Work instructions should be module-based, so focus on completing that module without touching others
+- Generally avoid writing Docs and Comments
+  - As this is not a public library and users are assumed to have high code comprehension, docs and comments are generally not needed
+  - Only include them when implementation intent is special
+- Use neverthrow for error handling
+  - Use neverthrow at error occurrence points when possible
+  - Handle errors procedurally rather than using Railway Oriented Programming to maintain readability
+- Use Usecase pattern on server-side
+  - Always initialize usecase class at API entry points, execute it, and format the response
+  - Usecase classes should have dependencies injected via constructor and an execute method for execution
