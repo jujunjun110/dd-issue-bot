@@ -3,6 +3,8 @@ import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 const SLACK_BOT_TOKEN = Deno.env.get("SLACK_BOT_TOKEN")!;
 
 serve(async (req) => {
+    console.log("💡 Request received:", req.method, req.headers.get("content-type"));
+
   // Slackのリクエストは基本POST
   if (req.method !== "POST") {
     return new Response("Method Not Allowed", { status: 405 });
