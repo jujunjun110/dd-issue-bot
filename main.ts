@@ -3,19 +3,17 @@ import { SlackClient } from "./src/clients/slackClient.ts";
 import { SlackEventUsecase } from "./src/usecases/slackEventUsecase.ts";
 import { Config } from "./src/config/configService.ts";
 
-// 設定を非同期で読み込み
-const configResult = await Config.load();
-
-if (configResult.isErr()) {
-  console.error(`❌ 起動エラー: ${configResult.error.message}`);
-  Deno.exit(1);
-}
-
-const config = configResult.value;
-const slackClient = new SlackClient(config.getSlackBotToken());
-const slackEventUsecase = new SlackEventUsecase(slackClient);
-
 serve(async (req) => {
+  const configResult = await Config.load();
+
+  if (configResult.isErr()) {
+    console.error(`❌ 起動エラー: ${configResult.error.message}`);
+    Deno.exit(1);
+  }
+
+  const config = configResult.value;
+  const slackClient = new SlackClient(config.getSlackBotToken());
+  const slackEventUsecase = new SlackEventUsecase(slackClient);
   console.log(
     "💡 Request received:",
     req.method,
