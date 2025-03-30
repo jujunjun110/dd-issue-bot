@@ -30,13 +30,12 @@ serve(async (req) => {
 
   const resultOrError = await slackEventUsecase.exec(body);
 
-  return resultOrError.match(
-    (result) => {
-      return new Response(result.body, { status: result.status });
-    },
-    (error) => {
-      console.error("❌ Error processing event:", error);
-      return new Response(error.message, { status: 500 });
-    }
-  );
+  if (resultOrError.isErr()) {
+    const error = resultOrError.error;
+    console.error("❌ Error processing event:", error);
+    return new Response(error.message, { status: 500 });
+  }
+
+  const result = resultOrError.value;
+  return new Response(result.body, { status: result.status });
 });
