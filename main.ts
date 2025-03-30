@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
-import { SlackClient } from "./src/adapters/slackClientAdapter.ts";
+import { SlackClient } from "./clients/slackClient.ts";
 import { SlackEventUsecase } from "./src/usecases/slackEventUsecase.ts";
 
 const SLACK_BOT_TOKEN = Deno.env.get("SLACK_BOT_TOKEN")!;

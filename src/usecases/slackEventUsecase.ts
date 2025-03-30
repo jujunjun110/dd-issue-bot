@@ -1,8 +1,5 @@
 import { Result, ok, err } from "npm:neverthrow";
-import {
-  SlackClientInterface,
-  SlackError,
-} from "../interfaces/slackClientInterface.ts";
+import { SlackClientInterface, SlackError } from "../../clients/slackClient.ts";
 
 export interface SlackEvent {
   type: string;
@@ -34,7 +31,6 @@ export class SlackEventUsecase {
   constructor(private slackClient: SlackClientInterface) {}
 
   async exec(body: SlackEventBody): Promise<Result<EventResult, EventError>> {
-    // SlackのURL検証（初回だけ来るやつ）
     if (body.type === "url_verification") {
       if (!body.challenge) {
         return err({

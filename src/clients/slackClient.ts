@@ -1,11 +1,31 @@
 import { Result, ok, err } from "npm:neverthrow";
-import {
-  SlackClientInterface,
-  SlackMessage,
-  SlackResponse,
-  SlackError,
-} from "../interfaces/slackClientInterface.ts";
 
+// インターフェース定義
+export interface SlackMessage {
+  channel: string;
+  thread_ts: string;
+  text: string;
+}
+
+export interface SlackResponse {
+  ok: boolean;
+  ts?: string;
+  error?: string;
+}
+
+export type SlackError = {
+  type: "API_ERROR" | "NETWORK_ERROR" | "INVALID_INPUT";
+  message: string;
+  originalError?: unknown;
+};
+
+export interface SlackClientInterface {
+  postMessage(
+    message: SlackMessage
+  ): Promise<Result<SlackResponse, SlackError>>;
+}
+
+// クライアント実装
 export class SlackClient implements SlackClientInterface {
   private token: string;
 

@@ -3,11 +3,11 @@ import {
   SlackEventUsecase,
   SlackEventBody,
 } from "../src/usecases/slackEventUsecase.ts";
+import { createSampleThread } from "./messages.ts";
 import {
   SlackClientInterface,
   SlackMessage,
-} from "../src/interfaces/slackClientInterface.ts";
-import { createSampleThread } from "./messages.ts";
+} from "../src/clients/slackClient.ts";
 
 class MockSlackClient implements SlackClientInterface {
   public messages: SlackMessage[] = [];
