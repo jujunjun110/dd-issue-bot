@@ -1,5 +1,5 @@
 import { Result, ok, err } from "npm:neverthrow";
-import { SlackClientInterface, SlackError } from "../../clients/slackClient.ts";
+import { SlackClientInterface, SlackError } from "../clients/slackClient.ts";
 
 export interface SlackEvent {
   type: string;
