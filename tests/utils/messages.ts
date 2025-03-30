@@ -1,4 +1,4 @@
-import { SlackEvent } from "../src/usecases/slackEventUsecase.ts";
+import { SlackEvent } from "../../src/usecases/slackEventUsecase.ts";
 
 /**
  * Factory function to create a test Slack message thread

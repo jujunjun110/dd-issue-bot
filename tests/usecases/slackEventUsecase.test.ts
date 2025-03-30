@@ -2,12 +2,12 @@ import { ok } from "npm:neverthrow";
 import {
   SlackEventUsecase,
   SlackEventBody,
-} from "../src/usecases/slackEventUsecase.ts";
-import { createSampleThread } from "./messages.ts";
+} from "../../src/usecases/slackEventUsecase.ts";
+import { createSampleThread } from "../utils/messages.ts";
 import {
   SlackClientInterface,
   SlackMessage,
-} from "../src/clients/slackClient.ts";
+} from "../../src/clients/slackClient.ts";
 
 class MockSlackClient implements SlackClientInterface {
   public messages: SlackMessage[] = [];
