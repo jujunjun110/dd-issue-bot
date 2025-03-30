@@ -15,7 +15,7 @@
   - Write interfaces for clients that depend on external systems to make dependent classes testable
 - Write tests for each work unit to verify correctness
   - Use jest
-  - To save time during development, don't run tests for all files using `npm jest`, instead run single test files or cases using `npx jest test/.../xxx.ts --testNamePattern="testName"`
+  - To save time during development, don't run tests for all files using `npm jest`, instead run single test files or cases using `npx jest test/.../xxx.ts --testNamePattern="testName" > ./commandResult.txt 2>&1`
   - For cases where test results cannot be read from standard output, output the test results to ./commandResult.txt as a file and read from it
 - Stay focused on the assigned work unit
   - Work instructions should be module-based, so focus on completing that module without touching others
