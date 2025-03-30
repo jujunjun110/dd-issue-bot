@@ -30,30 +30,29 @@ export class Config {
     return this.slackBotToken;
   }
 
+  private static getSystemEnvVars(): Record<string, string> {
+    return Object.values(ENV_KEYS).reduce((acc, key) => {
+      const value = Deno.env.get(key);
+      return value ? { ...acc, [key]: value } : acc;
+    }, {});
+  }
+
   static async load(): Promise<Result<Config, ConfigError>> {
     try {
-      // .envファイルから環境変数を読み込む
-      let envVars: Record<string, string> = {};
-
-      try {
-        // .envファイルを読み込む
-        envVars = await config();
-      } catch (loadError) {
-        console.log(
-          "No .env file found or error loading it, using system environment variables"
-        );
-      }
-
-      // システムの環境変数をマージ（システム環境変数が優先）
-      for (const key of Object.values(ENV_KEYS)) {
-        const value = Deno.env.get(key);
-        if (value) {
-          envVars[key] = value;
+      const loadDotEnv = async (): Promise<Record<string, string>> => {
+        try {
+          return await config();
+        } catch {
+          return {};
         }
-      }
+      };
 
-      const configInstance = new Config(envVars);
-      return ok(configInstance);
+      const dotenvVars = await loadDotEnv();
+      const isDeveloping = dotenvVars[ENV_KEYS.IS_DEVELOPING] === "true";
+
+      const envVars = isDeveloping ? dotenvVars : this.getSystemEnvVars();
+
+      return ok(new Config(envVars));
     } catch (error) {
       return err({
         type: "MISSING_ENV_VAR",
