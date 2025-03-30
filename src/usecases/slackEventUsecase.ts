@@ -1,5 +1,9 @@
 import { Result, ok, err } from "npm:neverthrow";
-import { SlackClientInterface, SlackError } from "../clients/slackClient.ts";
+import {
+  SlackClientInterface,
+  SlackError,
+  SlackThreadMessage,
+} from "../clients/slackClient.ts";
 
 export interface SlackEvent {
   type: string;
@@ -25,6 +29,7 @@ export type EventError =
 export type EventResult = {
   status: number;
   body?: string;
+  threadMessages?: SlackThreadMessage[];
 };
 
 export class SlackEventUsecase {
@@ -64,10 +69,22 @@ export class SlackEventUsecase {
     const channel = event.channel;
     const thread_ts = event.thread_ts || event.ts || "";
 
+    // スレッドの全メッセージを取得
+    const threadResult = await this.getThreadMessages(channel, thread_ts);
+    if (threadResult.isErr()) {
+      return err(threadResult.error);
+    }
+
+    const threadMessages = threadResult.value;
+
+    // デバッグ用にスレッドメッセージを出力
+    console.log(`✅ Retrieved ${threadMessages.length} messages from thread`);
+
+    // 応答メッセージを送信
     const result = await this.slackClient.postMessage({
       channel,
       thread_ts,
-      text: `オウム返し：${message}`,
+      text: `スレッドから${threadMessages.length}件のメッセージを取得しました。`,
     });
 
     return result
@@ -76,11 +93,29 @@ export class SlackEventUsecase {
         return {
           status: 200,
           body: "OK",
+          threadMessages,
         };
       })
       .mapErr((error) => {
         console.error("❌ Slack API error:", error);
         return error;
       });
+  }
+
+  /**
+   * スレッドの全メッセージを取得する
+   */
+  private async getThreadMessages(
+    channel: string,
+    thread_ts: string
+  ): Promise<Result<SlackThreadMessage[], SlackError>> {
+    const result = await this.slackClient.getThreadReplies(channel, thread_ts);
+
+    return result.map((response) => {
+      if (!response.messages) {
+        return [];
+      }
+      return response.messages;
+    });
   }
 }
