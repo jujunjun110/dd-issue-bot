@@ -19,5 +19,7 @@ export type SlackError = {
 };
 
 export interface SlackClientInterface {
-  postMessage(message: SlackMessage): Promise<Result<SlackResponse, SlackError>>;
+  postMessage(
+    message: SlackMessage
+  ): Promise<Result<SlackResponse, SlackError>>;
 }

@@ -1,5 +1,8 @@
 import { Result, ok, err } from "npm:neverthrow";
-import { SlackClientInterface, SlackError } from "../interfaces/slack-client.interface.ts";
+import {
+  SlackClientInterface,
+  SlackError,
+} from "../interfaces/slackClientInterface.ts";
 
 export interface SlackEvent {
   type: string;
@@ -15,10 +18,12 @@ export interface SlackEventBody {
   event?: SlackEvent;
 }
 
-export type EventError = SlackError | {
-  type: "INVALID_EVENT";
-  message: string;
-};
+export type EventError =
+  | SlackError
+  | {
+      type: "INVALID_EVENT";
+      message: string;
+    };
 
 export type EventResult = {
   status: number;
@@ -40,7 +45,7 @@ export class SlackEventUsecase {
 
       return ok({
         status: 200,
-        body: body.challenge
+        body: body.challenge,
       });
     }
 
@@ -48,7 +53,7 @@ export class SlackEventUsecase {
     if (!event || event.type !== "app_mention") {
       return ok({
         status: 200,
-        body: "Ignored (non-mention)"
+        body: "Ignored (non-mention)",
       });
     }
 
@@ -69,15 +74,17 @@ export class SlackEventUsecase {
       text: `オウム返し：${message}`,
     });
 
-    return result.map(response => {
-      console.log("✅ Sent message:", response.ts);
-      return {
-        status: 200,
-        body: "OK"
-      };
-    }).mapErr(error => {
-      console.error("❌ Slack API error:", error);
-      return error;
-    });
+    return result
+      .map((response) => {
+        console.log("✅ Sent message:", response.ts);
+        return {
+          status: 200,
+          body: "OK",
+        };
+      })
+      .mapErr((error) => {
+        console.error("❌ Slack API error:", error);
+        return error;
+      });
   }
 }

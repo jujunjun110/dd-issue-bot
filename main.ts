@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
-import { SlackClient } from "./src/adapters/slack-client.adapter.ts";
-import { SlackEventUsecase } from "./src/usecases/slack-event.usecase.ts";
+import { SlackClient } from "./src/adapters/slackClientAdapter.ts";
+import { SlackEventUsecase } from "./src/usecases/slackEventUsecase.ts";
 
 const SLACK_BOT_TOKEN = Deno.env.get("SLACK_BOT_TOKEN")!;
 
@@ -8,7 +8,11 @@ const slackClient = new SlackClient(SLACK_BOT_TOKEN);
 const slackEventUsecase = new SlackEventUsecase(slackClient);
 
 serve(async (req) => {
-  console.log("💡 Request received:", req.method, req.headers.get("content-type"));
+  console.log(
+    "💡 Request received:",
+    req.method,
+    req.headers.get("content-type")
+  );
 
   if (req.method !== "POST") {
     return new Response("Method Not Allowed", { status: 405 });

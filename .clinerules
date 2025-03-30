@@ -1,5 +1,7 @@
 # Coding Rules
 
+- This is Deno project
+- Respond with Japanese
 - Read README.md to understand the requirements
 - Write in functional style
   - Minimize use of variable definitions and reassignments with let

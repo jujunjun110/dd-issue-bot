@@ -1,5 +1,10 @@
 import { Result, ok, err } from "npm:neverthrow";
-import { SlackClientInterface, SlackMessage, SlackResponse, SlackError } from "../interfaces/slack-client.interface.ts";
+import {
+  SlackClientInterface,
+  SlackMessage,
+  SlackResponse,
+  SlackError,
+} from "../interfaces/slackClientInterface.ts";
 
 export class SlackClient implements SlackClientInterface {
   private token: string;
@@ -8,7 +13,9 @@ export class SlackClient implements SlackClientInterface {
     this.token = token;
   }
 
-  async postMessage(message: SlackMessage): Promise<Result<SlackResponse, SlackError>> {
+  async postMessage(
+    message: SlackMessage
+  ): Promise<Result<SlackResponse, SlackError>> {
     try {
       const response = await fetch("https://slack.com/api/chat.postMessage", {
         method: "POST",
