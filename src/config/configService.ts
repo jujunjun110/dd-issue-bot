@@ -17,12 +17,12 @@ export const ENV_KEYS = {
 };
 
 export class Config {
-  private slackBotToken: string;
-  private githubToken: string;
-  private githubOwner: string;
-  private githubRepo: string;
-  private difyApiKey: string;
-  private difyApplicationId: string;
+  readonly slackBotToken: string;
+  readonly githubToken: string;
+  readonly githubOwner: string;
+  readonly githubRepo: string;
+  readonly difyApiKey: string;
+  readonly difyApplicationId: string;
 
   constructor(envVars: Record<string, string>) {
     this.slackBotToken = envVars[ENV_KEYS.SLACK_BOT_TOKEN];
@@ -31,30 +31,6 @@ export class Config {
     this.githubRepo = envVars[ENV_KEYS.GITHUB_REPO];
     this.difyApiKey = envVars[ENV_KEYS.DIFY_API_KEY];
     this.difyApplicationId = envVars[ENV_KEYS.DIFY_APPLICATION_ID];
-  }
-
-  getSlackBotToken(): string {
-    return this.slackBotToken;
-  }
-
-  getGithubToken(): string {
-    return this.githubToken;
-  }
-
-  getGithubOwner(): string {
-    return this.githubOwner;
-  }
-
-  getGithubRepo(): string {
-    return this.githubRepo;
-  }
-
-  getDifyApiKey(): string {
-    return this.difyApiKey;
-  }
-
-  getDifyApplicationId(): string {
-    return this.difyApplicationId;
   }
 
   private static getSystemEnvVars(): Record<string, string> {
