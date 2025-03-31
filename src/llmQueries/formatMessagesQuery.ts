@@ -1,5 +1,6 @@
 import { SlackThreadMessage } from "../clients/slackClient.ts";
-import { LLMQuery } from "./llmQuery.ts";
+import { LLMQuery, LLMQueryError } from "./LLMQuery.ts";
+import { Result, ok, err } from "npm:neverthrow";
 
 export interface FormattedIssue {
   title: string;
@@ -42,20 +43,28 @@ JSON形式で以下の情報を返してください:
 `;
   }
 
-  parseResponse(response: string): FormattedIssue {
+  parseResponse(response: string): Result<FormattedIssue, LLMQueryError> {
     try {
       const cleanedResponse = this.extractJsonFromResponse(response);
       const parsedResponse = JSON.parse(cleanedResponse);
 
-      return {
-        title: parsedResponse.title || "タイトルなし",
-        body: parsedResponse.body || "本文なし",
-      };
-    } catch (_error) {
-      return {
-        title: "解析エラー",
-        body: "LLMの応答を正しく解析できませんでした。",
-      };
+      if (!parsedResponse.title || !parsedResponse.body) {
+        return err({
+          type: "FORMAT_ERROR",
+          message: "LLMの応答にtitleまたはbodyが含まれていません",
+        });
+      }
+
+      return ok({
+        title: parsedResponse.title,
+        body: parsedResponse.body,
+      });
+    } catch (error) {
+      return err({
+        type: "PARSE_ERROR",
+        message: "LLMの応答を正しく解析できませんでした",
+        originalError: error,
+      });
     }
   }
 
@@ -69,9 +78,9 @@ JSON形式で以下の情報を返してください:
         return trimmedResponse.substring(jsonStart, jsonEnd + 1);
       }
 
-      return '{"title": "応答形式エラー", "body": "LLMの応答を正しく解析できませんでした。"}';
-    } catch (_error) {
-      return '{"title": "応答形式エラー", "body": "LLMの応答を正しく解析できませんでした。"}';
+      throw new Error("JSONの形式が不正です");
+    } catch (error) {
+      throw error;
     }
   }
 }

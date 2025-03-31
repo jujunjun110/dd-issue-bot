@@ -1,6 +1,8 @@
 import { assertEquals } from "https://deno.land/std@0.220.1/assert/mod.ts";
 import { FormatMessagesQuery } from "../../src/llmQueries/formatMessagesQuery.ts";
 import { SlackThreadMessage } from "../../src/clients/slackClient.ts";
+import { LLMQueryError } from "../../src/llmQueries/LLMQuery.ts";
+import { Result } from "npm:neverthrow";
 
 Deno.test(
   "FormatMessagesQuery.buildPrompt should generate correct prompt format",
@@ -81,12 +83,15 @@ Deno.test(
 
     const result = query.parseResponse(response);
 
-    assertEquals(result.title, "グラフとテキストの色が一致していない");
-    assertEquals(
-      result.body.includes("ダッシュボードの一覧画面において"),
-      true
-    );
-    assertEquals(result.body.includes("## 再現手順"), true);
+    assertEquals(result.isOk(), true);
+    if (result.isOk()) {
+      assertEquals(result.value.title, "グラフとテキストの色が一致していない");
+      assertEquals(
+        result.value.body.includes("ダッシュボードの一覧画面において"),
+        true
+      );
+      assertEquals(result.value.body.includes("## 再現手順"), true);
+    }
   }
 );
 
@@ -98,7 +103,13 @@ Deno.test(
 
     const result = query.parseResponse(response);
 
-    assertEquals(result.title, "応答形式エラー");
-    assertEquals(result.body, "LLMの応答を正しく解析できませんでした。");
+    assertEquals(result.isErr(), true);
+    if (result.isErr()) {
+      assertEquals(result.error.type, "PARSE_ERROR");
+      assertEquals(
+        result.error.message,
+        "LLMの応答を正しく解析できませんでした"
+      );
+    }
   }
 );

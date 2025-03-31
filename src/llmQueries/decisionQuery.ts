@@ -1,5 +1,6 @@
 import { SlackThreadMessage } from "../clients/slackClient.ts";
-import { LLMQuery } from "./llmQuery.ts";
+import { LLMQuery, LLMQueryError } from "./LLMQuery.ts";
+import { Result, ok, err } from "npm:neverthrow";
 
 export interface DecisionResult {
   isSufficient: boolean;
@@ -41,22 +42,32 @@ JSON形式で以下の情報を返してください:
 `;
   }
 
-  parseResponse(response: string): DecisionResult {
+  parseResponse(response: string): Result<DecisionResult, LLMQueryError> {
     try {
       const cleanedResponse = this.extractJsonFromResponse(response);
       const parsedResponse = JSON.parse(cleanedResponse);
 
-      return {
+      if (
+        parsedResponse.isSufficient === undefined ||
+        !Array.isArray(parsedResponse.missingFields)
+      ) {
+        return err({
+          type: "FORMAT_ERROR",
+          message:
+            "LLMの応答にisSufficientまたはmissingFieldsが含まれていません",
+        });
+      }
+
+      return ok({
         isSufficient: parsedResponse.isSufficient === true,
-        missingFields: Array.isArray(parsedResponse.missingFields)
-          ? parsedResponse.missingFields
-          : [],
-      };
-    } catch (_error) {
-      return {
-        isSufficient: false,
-        missingFields: ["解析エラー - LLMの応答を正しく解析できませんでした"],
-      };
+        missingFields: parsedResponse.missingFields,
+      });
+    } catch (error) {
+      return err({
+        type: "PARSE_ERROR",
+        message: "LLMの応答を正しく解析できませんでした",
+        originalError: error,
+      });
     }
   }
 
@@ -68,6 +79,6 @@ JSON形式で以下の情報を返してください:
       return match[0];
     }
 
-    return '{"isSufficient": false, "missingFields": ["応答形式エラー"]}';
+    throw new Error("JSONの形式が不正です");
   }
 }

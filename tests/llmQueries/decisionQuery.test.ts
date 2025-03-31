@@ -1,6 +1,8 @@
 import { assertEquals } from "https://deno.land/std@0.220.1/assert/mod.ts";
 import { DecisionQuery } from "../../src/llmQueries/decisionQuery.ts";
 import { SlackThreadMessage } from "../../src/clients/slackClient.ts";
+import { LLMQueryError } from "../../src/llmQueries/LLMQuery.ts";
+import { Result } from "npm:neverthrow";
 
 Deno.test(
   "DecisionQuery.buildPrompt should generate correct prompt format",
@@ -81,10 +83,13 @@ Deno.test(
 
     const result = query.parseResponse(response);
 
-    assertEquals(result.isSufficient, false);
-    assertEquals(result.missingFields.length, 3);
-    assertEquals(result.missingFields[0], "タイトル");
-    assertEquals(result.missingFields[1], "再現手順");
-    assertEquals(result.missingFields[2], "環境情報");
+    assertEquals(result.isOk(), true);
+    if (result.isOk()) {
+      assertEquals(result.value.isSufficient, false);
+      assertEquals(result.value.missingFields.length, 3);
+      assertEquals(result.value.missingFields[0], "タイトル");
+      assertEquals(result.value.missingFields[1], "再現手順");
+      assertEquals(result.value.missingFields[2], "環境情報");
+    }
   }
 );

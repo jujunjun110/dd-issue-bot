@@ -16,11 +16,12 @@ export class LLMQueryService {
       return err(result.error);
     }
 
-    try {
-      const parsedResult = query.parseResponse(result.value);
-      return ok(parsedResult);
-    } catch (error) {
-      return err(error instanceof Error ? error : new Error(String(error)));
+    const parsedResult = query.parseResponse(result.value);
+
+    if (parsedResult.isErr()) {
+      return err(new Error(parsedResult.error.message));
     }
+
+    return ok(parsedResult.value);
   }
 }
