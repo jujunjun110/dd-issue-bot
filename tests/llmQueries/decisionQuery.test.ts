@@ -2,10 +2,7 @@ import {
   assertEquals,
   assertStringIncludes,
 } from "https://deno.land/std@0.220.1/assert/mod.ts";
-import {
-  DecisionQuery,
-  DecisionResult,
-} from "../../src/llmQueries/decisionQuery.ts";
+import { DecisionQuery } from "../../src/llmQueries/decisionQuery.ts";
 import { SlackThreadMessage } from "../../src/clients/slackClient.ts";
 
 Deno.test(
@@ -14,19 +11,25 @@ Deno.test(
     const messages: SlackThreadMessage[] = [
       {
         ts: "1616461034.001000",
-        text: "ログイン画面でエラーが発生しています",
+        text: "困ったことを見つけたな。",
         user: "U87654321",
         thread_ts: "1616461034.001000",
       },
       {
         ts: "1616461044.001100",
-        text: "詳細: ユーザーがログインボタンをクリックした後、エラーメッセージが表示されずに画面がフリーズします",
+        text: "一覧画面で表示されているグラフの色と、テキストの色が異なっている",
         user: "U87654321",
         thread_ts: "1616461034.001000",
       },
       {
-        ts: "1616461054.001200",
-        text: "再現手順:\n1. ログイン画面にアクセス\n2. メールアドレスとパスワードを入力\n3. ログインボタンをクリック\n4. 画面がフリーズし、何も表示されない",
+        ts: "1616461044.001100",
+        text: "報告ありがとう！それが実現されないとどのようなことが困りますか？",
+        user: "U87654321",
+        thread_ts: "1616461034.001000",
+      },
+      {
+        ts: "1616461044.001100",
+        text: "ユーザーがデータを見るときに、混乱してしまう。",
         user: "U87654321",
         thread_ts: "1616461034.001000",
       },
@@ -39,15 +42,13 @@ Deno.test(
 以下のSlackスレッドの会話を分析し、GitHub Issueとして必要な情報が揃っているか判断してください。
 
 会話内容:
-ユーザー U87654321: ログイン画面でエラーが発生しています
+ユーザー U87654321: 困ったことを見つけたな。
 
-ユーザー U87654321: 詳細: ユーザーがログインボタンをクリックした後、エラーメッセージが表示されずに画面がフリーズします
+ユーザー U87654321: 一覧画面で表示されているグラフの色と、テキストの色が異なっている
 
-ユーザー U87654321: 再現手順:
-1. ログイン画面にアクセス
-2. メールアドレスとパスワードを入力
-3. ログインボタンをクリック
-4. 画面がフリーズし、何も表示されない
+ユーザー U87654321: 報告ありがとう！それが実現されないとどのようなことが困りますか？
+
+ユーザー U87654321: ユーザーがデータを見るときに、混乱してしまう。
 
 GitHub Issueとして必要な情報:
 1. タイトル（問題の簡潔な説明）
@@ -66,26 +67,6 @@ JSON形式で以下の情報を返してください:
 `;
 
     assertEquals(prompt.trim(), expectedPrompt.trim());
-
-    // 以下は念のため個別の要素も確認
-    assertStringIncludes(prompt, "以下のSlackスレッドの会話を分析し");
-    assertStringIncludes(prompt, "GitHub Issueとして必要な情報");
-    assertStringIncludes(prompt, "会話内容:");
-    assertStringIncludes(
-      prompt,
-      "ユーザー U87654321: ログイン画面でエラーが発生しています"
-    );
-    assertStringIncludes(
-      prompt,
-      "ユーザー U87654321: 詳細: ユーザーがログインボタンをクリックした後"
-    );
-    assertStringIncludes(prompt, "ユーザー U87654321: 再現手順:");
-    assertStringIncludes(prompt, "JSON形式で以下の情報を返してください");
-    assertStringIncludes(prompt, '"isSufficient": true または false');
-    assertStringIncludes(
-      prompt,
-      '"missingFields": ["不足している情報のフィールド名", ...]'
-    );
   }
 );
 
