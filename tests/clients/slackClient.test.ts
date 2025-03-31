@@ -1,4 +1,3 @@
-import { ok } from "npm:neverthrow";
 import {
   assertEquals,
   assertExists,
@@ -9,10 +8,13 @@ import {
 } from "../../src/clients/slackClient.ts";
 
 // モックフェッチの実装
+// deno-lint-ignore no-explicit-any
 const createMockFetch = (responseData: any) => {
-  return async (url: string, options: RequestInit) => {
+  // deno-lint-ignore require-await
+  return async (_url: string, _options: RequestInit) => {
     return {
       ok: true,
+      // deno-lint-ignore require-await
       json: async () => responseData,
     };
   };

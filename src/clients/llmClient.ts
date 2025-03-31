@@ -1,5 +1,5 @@
-import { Result, ok, err } from "npm:neverthrow";
-import { LLMQuery } from "../llmQueries/LLMQuery.ts";
+import { Result, err, ok } from "npm:neverthrow";
+import { LLMQuery } from "../llmQueries/aiQuery.ts";
 
 export interface LLMClient {
   post(prompt: string): Promise<Result<string, Error>>;

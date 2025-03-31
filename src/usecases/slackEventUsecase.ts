@@ -65,7 +65,7 @@ export class SlackEventUsecase {
       });
     }
 
-    const message = event.text;
+    const _message = event.text;
     const channel = event.channel;
     const thread_ts = event.thread_ts || event.ts || "";
 
