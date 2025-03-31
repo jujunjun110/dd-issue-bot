@@ -1,16 +1,19 @@
 import { assertEquals } from "https://deno.land/std@0.220.1/assert/mod.ts";
 import { GitHubClient, GitHubIssue } from "../../src/clients/githubClient.ts";
 
-const createMockFetch = (status: number, responseData: any) => {
+const createMockFetch = (
+  status: number,
+  responseData: Record<string, unknown>
+) => {
   const originalFetch = globalThis.fetch;
 
-  globalThis.fetch = async () => {
-    return {
+  globalThis.fetch = () => {
+    return Promise.resolve({
       ok: status >= 200 && status < 300,
       status,
       statusText: status === 200 ? "OK" : "Error",
-      json: async () => responseData,
-    } as Response;
+      json: () => Promise.resolve(responseData),
+    } as Response);
   };
 
   return () => {
@@ -103,8 +106,8 @@ Deno.test("GitHubClient - postIssue - API error", async () => {
 Deno.test("GitHubClient - postIssue - network error", async () => {
   const originalFetch = globalThis.fetch;
 
-  globalThis.fetch = async () => {
-    throw new Error("Network error");
+  globalThis.fetch = () => {
+    return Promise.reject(new Error("Network error"));
   };
 
   try {
