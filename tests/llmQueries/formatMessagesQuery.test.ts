@@ -1,8 +1,6 @@
 import { assertEquals } from "https://deno.land/std@0.220.1/assert/mod.ts";
 import { FormatMessagesQuery } from "../../src/llmQueries/formatMessagesQuery.ts";
 import { SlackThreadMessage } from "../../src/clients/slackClient.ts";
-import { LLMQueryError } from "../../src/llmQueries/LLMQuery.ts";
-import { Result } from "npm:neverthrow";
 
 Deno.test(
   "FormatMessagesQuery.buildPrompt should generate correct prompt format",

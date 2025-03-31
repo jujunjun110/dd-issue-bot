@@ -1,8 +1,6 @@
 import { assertEquals } from "https://deno.land/std@0.220.1/assert/mod.ts";
 import { DecisionQuery } from "../../src/llmQueries/decisionQuery.ts";
 import { SlackThreadMessage } from "../../src/clients/slackClient.ts";
-import { LLMQueryError } from "../../src/llmQueries/LLMQuery.ts";
-import { Result } from "npm:neverthrow";
 
 Deno.test(
   "DecisionQuery.buildPrompt should generate correct prompt format",
