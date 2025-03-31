@@ -1,5 +1,5 @@
 import { SlackThreadMessage } from "../clients/slackClient.ts";
-import { LLMQuery, LLMQueryError } from "./LLMQuery.ts";
+import { LLMQuery, LLMQueryError } from "./aiQuery.ts";
 import { Result, ok, err } from "npm:neverthrow";
 
 export interface DecisionResult {
