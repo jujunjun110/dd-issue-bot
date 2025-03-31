@@ -9,25 +9,67 @@ export type ConfigError = {
 export const ENV_KEYS = {
   IS_DEVELOPING: "IS_DEVELOPING",
   SLACK_BOT_TOKEN: "SLACK_BOT_TOKEN",
+  GITHUB_TOKEN: "GITHUB_TOKEN",
+  GITHUB_OWNER: "GITHUB_OWNER",
+  GITHUB_REPO: "GITHUB_REPO",
+  DIFY_API_KEY: "DIFY_API_KEY",
+  DIFY_APPLICATION_ID: "DIFY_APPLICATION_ID",
 };
 
 export class Config {
   private slackBotToken: string;
+  private githubToken: string;
+  private githubOwner: string;
+  private githubRepo: string;
+  private difyApiKey: string;
+  private difyApplicationId: string;
 
   constructor(envVars: Record<string, string>) {
-    const token = envVars[ENV_KEYS.SLACK_BOT_TOKEN];
+    const requiredEnvVars = [
+      ENV_KEYS.SLACK_BOT_TOKEN,
+      ENV_KEYS.GITHUB_TOKEN,
+      ENV_KEYS.GITHUB_OWNER,
+      ENV_KEYS.GITHUB_REPO,
+      ENV_KEYS.DIFY_API_KEY,
+      ENV_KEYS.DIFY_APPLICATION_ID,
+    ];
 
-    if (!token) {
-      throw new Error(
-        `Required environment variable ${ENV_KEYS.SLACK_BOT_TOKEN} is missing`
-      );
+    for (const key of requiredEnvVars) {
+      if (!envVars[key]) {
+        throw new Error(`Required environment variable ${key} is missing`);
+      }
     }
 
-    this.slackBotToken = token;
+    this.slackBotToken = envVars[ENV_KEYS.SLACK_BOT_TOKEN];
+    this.githubToken = envVars[ENV_KEYS.GITHUB_TOKEN];
+    this.githubOwner = envVars[ENV_KEYS.GITHUB_OWNER];
+    this.githubRepo = envVars[ENV_KEYS.GITHUB_REPO];
+    this.difyApiKey = envVars[ENV_KEYS.DIFY_API_KEY];
+    this.difyApplicationId = envVars[ENV_KEYS.DIFY_APPLICATION_ID];
   }
 
   getSlackBotToken(): string {
     return this.slackBotToken;
+  }
+
+  getGithubToken(): string {
+    return this.githubToken;
+  }
+
+  getGithubOwner(): string {
+    return this.githubOwner;
+  }
+
+  getGithubRepo(): string {
+    return this.githubRepo;
+  }
+
+  getDifyApiKey(): string {
+    return this.difyApiKey;
+  }
+
+  getDifyApplicationId(): string {
+    return this.difyApplicationId;
   }
 
   private static getSystemEnvVars(): Record<string, string> {
