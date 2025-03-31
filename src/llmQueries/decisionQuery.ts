@@ -52,7 +52,7 @@ JSON形式で以下の情報を返してください:
           ? parsedResponse.missingFields
           : [],
       };
-    } catch (error) {
+    } catch (_error) {
       return {
         isSufficient: false,
         missingFields: ["解析エラー - LLMの応答を正しく解析できませんでした"],
