@@ -25,21 +25,6 @@ export class Config {
   private difyApplicationId: string;
 
   constructor(envVars: Record<string, string>) {
-    const requiredEnvVars = [
-      ENV_KEYS.SLACK_BOT_TOKEN,
-      ENV_KEYS.GITHUB_TOKEN,
-      ENV_KEYS.GITHUB_OWNER,
-      ENV_KEYS.GITHUB_REPO,
-      ENV_KEYS.DIFY_API_KEY,
-      ENV_KEYS.DIFY_APPLICATION_ID,
-    ];
-
-    for (const key of requiredEnvVars) {
-      if (!envVars[key]) {
-        throw new Error(`Required environment variable ${key} is missing`);
-      }
-    }
-
     this.slackBotToken = envVars[ENV_KEYS.SLACK_BOT_TOKEN];
     this.githubToken = envVars[ENV_KEYS.GITHUB_TOKEN];
     this.githubOwner = envVars[ENV_KEYS.GITHUB_OWNER];
@@ -94,10 +79,30 @@ export class Config {
 
       const envVars = isDeveloping ? dotenvVars : this.getSystemEnvVars();
 
+      const requiredEnvVars = [
+        ENV_KEYS.SLACK_BOT_TOKEN,
+        ENV_KEYS.GITHUB_TOKEN,
+        ENV_KEYS.GITHUB_OWNER,
+        ENV_KEYS.GITHUB_REPO,
+        ENV_KEYS.DIFY_API_KEY,
+        ENV_KEYS.DIFY_APPLICATION_ID,
+      ];
+
+      const missingEnvVars = requiredEnvVars.filter((key) => !envVars[key]);
+
+      if (missingEnvVars.length > 0) {
+        return err({
+          type: "MISSING_ENV_VAR",
+          message: `Required environment variables are missing: ${missingEnvVars.join(
+            ", "
+          )}`,
+        });
+      }
+
       return ok(new Config(envVars));
     } catch (error) {
       return err({
-        type: "MISSING_ENV_VAR",
+        type: "ENV_LOAD_ERROR",
         message: error.message,
       });
     }
