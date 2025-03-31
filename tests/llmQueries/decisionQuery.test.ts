@@ -35,6 +35,39 @@ Deno.test(
     const query = new DecisionQuery(messages);
     const prompt = query.buildPrompt();
 
+    const expectedPrompt = `
+以下のSlackスレッドの会話を分析し、GitHub Issueとして必要な情報が揃っているか判断してください。
+
+会話内容:
+ユーザー U87654321: ログイン画面でエラーが発生しています
+
+ユーザー U87654321: 詳細: ユーザーがログインボタンをクリックした後、エラーメッセージが表示されずに画面がフリーズします
+
+ユーザー U87654321: 再現手順:
+1. ログイン画面にアクセス
+2. メールアドレスとパスワードを入力
+3. ログインボタンをクリック
+4. 画面がフリーズし、何も表示されない
+
+GitHub Issueとして必要な情報:
+1. タイトル（問題の簡潔な説明）
+2. 詳細な説明（問題の詳細）
+3. 再現手順（問題を再現するための手順）
+4. 期待される動作（本来どうあるべきか）
+5. 実際の動作（現在どうなっているか）
+6. 環境情報（OS、ブラウザ、バージョンなど）
+
+JSON形式で以下の情報を返してください:
+{
+  "isSufficient": true または false,
+  "missingFields": ["不足している情報のフィールド名", ...],
+  "analysis": "分析結果の説明"
+}
+`;
+
+    assertEquals(prompt.trim(), expectedPrompt.trim());
+
+    // 以下は念のため個別の要素も確認
     assertStringIncludes(prompt, "以下のSlackスレッドの会話を分析し");
     assertStringIncludes(prompt, "GitHub Issueとして必要な情報");
     assertStringIncludes(prompt, "会話内容:");
